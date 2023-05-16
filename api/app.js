@@ -32,8 +32,11 @@ app.use(express.urlencoded({ extended: false }));
 //Routes
 const usersRouter = require('./Routes/users')
 const recipesRouter = require('./Routes/recipes')
+const authRouther = require('./Routes/auth')
 
+app.use('/auth',authRouther)
 app.use('/users', usersRouter)
 app.use('/recipes', recipesRouter)
+
 
 module.exports = app;
