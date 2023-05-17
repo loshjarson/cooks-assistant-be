@@ -16,10 +16,10 @@ const recipeSchema = new mongoose.Schema({
     cookTime: Number,
     totalTime: Number,
     servings: Number,
-    difficulty: String,
+    owner: String,
     tags: [String],
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: () => Date.now(), immutable:true },
+    updatedAt: { type: Date, default: () => Date.now() }
 })
 
 module.exports = mongoose.model('Recipe', recipeSchema)
