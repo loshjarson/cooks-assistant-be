@@ -6,6 +6,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const dotenv = require('dotenv').config();
 
+const {restricted} = require("./middleware/middleware")
 
 const app = express();
 
@@ -32,11 +33,11 @@ app.use(express.urlencoded({ extended: false }));
 //Routes
 const usersRouter = require('./Routes/users')
 const recipesRouter = require('./Routes/recipes')
-const authRouther = require('./Routes/auth')
+const authRouter = require('./Routes/auth')
 
-app.use('/auth',authRouther)
-app.use('/users', usersRouter)
-app.use('/recipes', recipesRouter)
+app.use('/auth', authRouter)
+app.use('/users', restricted ,usersRouter)
+app.use('/recipes', restricted ,recipesRouter)
 
 
 module.exports = app;
