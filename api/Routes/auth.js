@@ -23,13 +23,13 @@ router.post("/register", async (req,res) => {
         const hash = bcrypt.hashSync(password)
 
         const user = await User.create({username:username,password:hash})
-        if(user){
-            const token = makeToken(user);
-            res.status(201).json({
-                message: `Welcome, ${user.username}`,
-                token,
-            })
-        }
+        
+        const token = makeToken(user);
+        res.status(201).json({
+            message: `Welcome, ${user.username}`,
+            token,
+            id: user._id
+        })
     } catch (e) {
         console.log(e.message)
         res.status(401)
