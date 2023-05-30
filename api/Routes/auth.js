@@ -1,4 +1,4 @@
-const router = require("express").Router
+const router = require("express").Router()
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 
@@ -52,3 +52,5 @@ router.post("/login", async (req,res) => {
         res.status(401).json({ message: "Please check credentials" });
     }
 })
+
+module.exports = router
