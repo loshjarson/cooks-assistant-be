@@ -2,7 +2,7 @@ require('dotenv').config()
 
 const jwt = require("jsonwebtoken")
 
-const User = require("../../data/models/")
+const User = require("../../data/user")
 
 const restricted = (req, res, next) => {
     const authHeader = req.headers.authorization;
