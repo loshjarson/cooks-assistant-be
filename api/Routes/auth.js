@@ -42,11 +42,11 @@ router.post("/login", async (req,res) => {
     const user = await User.findOne({username})
     
     if(user && bcrypt.compareSync(password,user.password)) {
-        const token = makeToken(savedUser);
+        const token = makeToken(user);
         res.status(200).json({
-            message: `${savedUser.username} is back!`,
+            message: `${user.username} is back!`,
             token,
-            userID: savedUser.id
+            userID: user.id
         });
     } else {
         res.status(401).json({ message: "Please check credentials" });
