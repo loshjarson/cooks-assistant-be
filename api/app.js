@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const dotenv = require('dotenv').config();
+const mongoose = require('mongoose');
 
 const {restricted} = require("./middleware/middleware")
 
@@ -15,8 +16,16 @@ const app = express();
 const mongoose = require("mongoose")
 mongoose.connect(process.env.DATABASE_URL)
 const db = mongoose.connection
+
 db.on('error', (error) => console.log(error))
-db.once('open', ()=> console.log("Connected to database"))
+
+let gfs;
+db.once('open', () => {
+  console.log("Connected to database")
+  gfs = new mongoose.mongo.GridFSBucket(db.db, {
+    bucketName: 'images',
+  });
+})
 
 
 //Middleware
