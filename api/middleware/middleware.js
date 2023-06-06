@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { GridFsStorage } = require('multer-gridfs-storage');
 const jwt = require("jsonwebtoken")
-
+const multer = require("multer")
 const User = require("../../data/user");
 
 
