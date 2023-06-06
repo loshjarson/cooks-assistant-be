@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const dotenv = require('dotenv').config();
-const mongoose = require('mongoose');
 
 const {restricted} = require("./middleware/middleware")
 
