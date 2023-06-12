@@ -1,7 +1,5 @@
 require('dotenv').config()
-const { GridFsStorage } = require('multer-gridfs-storage');
 const jwt = require("jsonwebtoken")
-const multer = require("multer")
 const User = require("../../data/user");
 
 
@@ -22,17 +20,5 @@ const restricted = (req, res, next) => {
     }
   };
 
-const imgStorage = new GridFsStorage({
-  url: process.env.DATABASE_URL,
-  options: {useNewUrlParser:true, useUnifiedTopology:true},
-  file: (req, file) => {
-    return {
-      bucketName: 'images',
-      filename: Date.now() + '-' + file.originalname,
-    };
-  }
-})
 
-const uploadImage = multer({imgStorage})
-
-module.exports = { restricted, uploadImage }
+module.exports = { restricted }

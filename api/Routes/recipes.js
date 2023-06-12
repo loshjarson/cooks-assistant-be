@@ -1,40 +1,50 @@
 const router = require('express').Router()
+const multer = require('multer')
 const Recipe = require("../../data/recipe")
-const {uploadImage} = require('../middleware/middleware')
+const {uploadFile, getFile} = require('../s3')
+const fs = require('fs')
 
-router.get('/:userId', (req,res) => {
+router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
-        Recipe.find({owner:userId})
-            .populate('image')
-            .exec((err, recipes) => {
-                if (err) {
-                  console.error('Error retrieving recipes:', err);
-                  return res.status(500).json({ message: 'Failed to retrieve recipes' });
-                }
+        const recipes = await Recipe.find({owner:userId}).exec()
+            // .exec((err, recipes) => {
+            //     if (err) {
+            //       console.error('Error retrieving recipes:', err);
+            //       return res.status(500).json({ message: 'Failed to retrieve recipes' });
+            //     }
           
-                res.json({ recipes });
-            });
+                
+            // });
+            res.json({recipes})
     } catch (e) {
         console.log(e.message)
         res.status(500)
     }
 })
 
-router.post('/', uploadImage.single('image'), async (req,res) => {
+const uploadImage = multer({dest:"uploads/"})
+
+router.post('/:userId', uploadImage.single("image"), async (req,res) => {
     try {
+        req.body.owner = req.params.userId
+        req.body.ingredients = JSON.parse(req.body.ingredients)
+        req.body.instructions = JSON.parse(req.body.instructions)
         const recipe = new Recipe(req.body)
+        console.log(req.file)
+        const uploadResult = await uploadFile(req.file)
         if (req.file) {
-            recipe.image = req.file.id;
+            recipe.image = {url:uploadResult.Location,key:uploadResult.key};
         }
-        recipe.save((err, savedRecipe) => {
-        if (err) {
-            console.error('Error saving recipe:', err);
-            return res.status(500).json({ message: 'Failed to save recipe' });
-        }
+        const savedRecipe = await recipe.save(recipe)
+        console.log(savedRecipe)
+        fs.rm(req.file.path)
+        // if (err) {
+        //     console.error('Error saving recipe:', err);
+        //     return res.status(500).json({ message: 'Failed to save recipe' });
+        // }
     
         res.json({ recipe: savedRecipe });
-        });
 
     } catch (e) {
         console.log(e.message)

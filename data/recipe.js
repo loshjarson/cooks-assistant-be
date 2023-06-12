@@ -21,9 +21,9 @@ const recipeSchema = new mongoose.Schema({
     servings: Number,
     owner: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
     tags: [String],
+    image: {url:String, key:String},
     createdAt: { type: Date, default: () => Date.now(), immutable:true },
-    updatedAt: { type: Date, default: () => Date.now() },
-    image: {type: mongoose.Schema.Types.ObjectId, ref:'Image'}
+    updatedAt: { type: Date, default: () => Date.now() }
 })
 
 module.exports = mongoose.model('Recipe', recipeSchema)
