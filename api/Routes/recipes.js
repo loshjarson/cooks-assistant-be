@@ -11,9 +11,12 @@ router.get('/:userId', async (req,res) => {
         const userId = req.params.userId
         const recipes = await Recipe.find({owner:userId}).exec()
         for(const recipe in recipes){
-            const recipeImage = await getFile(recipes[recipe].image.key)
-            const updatedObj = {...recipes[recipe], image:recipeImage}
-            recipes[recipe] = updatedObj
+            if(recipes[recipe].image.key){
+                const recipeImage = await getFile(recipes[recipe].image.key)
+                const updatedObj = {...recipes[recipe], image:recipeImage}
+                recipes[recipe] = updatedObj
+            }
+            
         }
         
             // .exec((err, recipes) => {
@@ -28,7 +31,7 @@ router.get('/:userId', async (req,res) => {
             res.json({recipes});
             
     } catch (e) {
-        console.log(e.message)
+        console.log(e)
         res.status(500)
     }
 })
@@ -50,17 +53,20 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
                 console.log("succesfully deleted image from local server")
             })
         }
-        const savedRecipe = await recipe.save(recipe)
+        let savedRecipe = await recipe.save(recipe)
+        if(recipe.image){
+            const recipeImage = await getFile(savedRecipe.image.key)
+            savedRecipe = {...savedRecipe, image:recipeImage}
+        }
 
-        const recipeImage = await getFile(savedRecipe.image.key)
-        const updatedObj = {...savedRecipe, image:recipeImage}
+        
 
         // if (err) {
         //     console.error('Error saving recipe:', err);
         //     return res.status(500).json({ message: 'Failed to save recipe' });
         // }
     
-        res.json({ recipe: updatedObj });
+        res.json({ recipe: savedRecipe });
 
     } catch (e) {
         console.log(e.message)
