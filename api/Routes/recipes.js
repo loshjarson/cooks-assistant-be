@@ -4,6 +4,8 @@ const Recipe = require("../../data/recipe")
 const {uploadFile, getFile} = require('../s3')
 const fs = require('fs')
 
+
+
 router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
@@ -39,22 +41,26 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
         req.body.ingredients = JSON.parse(req.body.ingredients)
         req.body.instructions = JSON.parse(req.body.instructions)
         const recipe = new Recipe(req.body)
-        console.log(req.file)
-        const uploadResult = await uploadFile(req.file)
+
+        
         if (req.file) {
+            const uploadResult = await uploadFile(req.file)
             recipe.image = {url:uploadResult.Location,key:uploadResult.key};
+            fs.rm(req.file.path,()=>{
+                console.log("succesfully deleted image from local server")
+            })
         }
         const savedRecipe = await recipe.save(recipe)
-        console.log(savedRecipe)
-        fs.rm(req.file.path,()=>{
-            console.log("succesfully deleted image from local server")
-        })
+
+        const recipeImage = await getFile(savedRecipe.image.key)
+        const updatedObj = {...savedRecipe, image:recipeImage}
+
         // if (err) {
         //     console.error('Error saving recipe:', err);
         //     return res.status(500).json({ message: 'Failed to save recipe' });
         // }
     
-        res.json({ recipe: savedRecipe });
+        res.json({ recipe: updatedObj });
 
     } catch (e) {
         console.log(e.message)
