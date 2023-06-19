@@ -43,6 +43,7 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
         req.body.owner = req.params.userId
         req.body.ingredients = JSON.parse(req.body.ingredients)
         req.body.instructions = JSON.parse(req.body.instructions)
+        req.body.tags = JSON.parse(req.body.tags)
         const recipe = new Recipe(req.body)
 
         
