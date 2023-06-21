@@ -12,8 +12,7 @@ const recipeSchema = new mongoose.Schema({
         unit: String
     }],
     instructions: {
-        id:Number,
-        instruction:String
+        type:Object
     },
     prepTime: Number,
     cookTime: Number,
