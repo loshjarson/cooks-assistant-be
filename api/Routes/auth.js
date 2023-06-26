@@ -53,4 +53,20 @@ router.post("/login", async (req,res) => {
     }
 })
 
+router.post("/authenticate", async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) {
+        res.status(403).json({message:"Token is invalid"});
+    } else {
+      jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+        if (err) {
+          res.status(403).json({message:"Token is invalid"});
+        } else {
+          res.status(200).json("User authenticated")
+        }
+      });
+    }
+})
+
 module.exports = router
