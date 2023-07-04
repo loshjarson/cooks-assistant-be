@@ -36,4 +36,14 @@ const getFile = async (fileKey) => {
     return data.Body
 }
 
-module.exports = {uploadFile,getFile}
+const deleteFile = async (fileKey) => {
+    const deleteParams = {
+        Key: fileKey,
+        Bucket: bucketName
+    }
+
+    const data = await s3.deleteObject(deleteParams).promise()
+    return data
+}
+
+module.exports = {uploadFile,getFile,deleteFile}
