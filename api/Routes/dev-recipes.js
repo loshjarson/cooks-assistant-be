@@ -14,7 +14,7 @@ const getFile = (filePath) => {
 const deleteFile = (filePath) => {
     try{
         fs.unlinkSync(filePath);
-        return "file deleted"
+        return "file deleted successfully"
     }
     catch(e){
         return e
@@ -116,7 +116,10 @@ router.delete('/:recipeId', async (req,res) => {
         const recipeId = req.params.recipeId
         const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
         if(recipe.image.key){
-            const recipeImage = await deleteFile(recipes[recipe].image.key)
+            const recipeImage = await deleteFile(recipes[recipe].image.url)
+            if(typeof recipeImage !== string){
+                res.status(400).json({message:"error while deleting image"})
+            }
         }
         if(recipe != null){
             res.status(201).json({message:"Recipe deleted"})
