@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const multer = require('multer')
 const Recipe = require("../../data/recipe")
-const {uploadFile, getFile} = require('../s3')
+const {uploadFile, getFile, deleteFile} = require('../s3')
 const fs = require('fs')
 
 
@@ -112,8 +112,22 @@ router.patch('/:recipeId', uploadImage.single('image'), async (req,res) => {
     
 })
 
-router.delete('/:recipeId', (req,res) => {
-
+router.delete('/:recipeId', async (req,res) => {
+    try {
+        const recipeId = req.params.recipeId
+        const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
+        if(recipe.image.key){
+            const recipeImage = await deleteFile(recipes[recipe].image.key)
+        }
+        if(recipe != null){
+            res.status(201).json({message:"Recipe deleted"})
+        } else {
+            res.status(400).json({message:"No matching recipe found"})
+        }     
+    } catch (e) {
+        console.log(e.message)
+        res.status(401)
+    }
 })
 
 

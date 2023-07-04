@@ -9,6 +9,19 @@ const getFile = (filePath) => {
     return inputBuffer
 }
 
+//remove image from local files
+
+const deleteFile = (filePath) => {
+    try{
+        fs.unlinkSync(filePath);
+        return "file deleted successfully"
+    }
+    catch(e){
+        return e
+    }
+
+}
+
 router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
@@ -98,8 +111,25 @@ router.patch('/:recipeId', uploadImage.single('image'), async (req,res) => {
     
 })
 
-router.delete('/:recipeId', (req,res) => {
-    
+router.delete('/:recipeId', async (req,res) => {
+    try {
+        const recipeId = req.params.recipeId
+        const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
+        if(recipe.image.key){
+            const recipeImage = await deleteFile(recipes[recipe].image.url)
+            if(typeof recipeImage !== string){
+                res.status(400).json({message:"error while deleting image"})
+            }
+        }
+        if(recipe != null){
+            res.status(201).json({message:"Recipe deleted"})
+        } else {
+            res.status(400).json({message:"No matching recipe found"})
+        }     
+    } catch (e) {
+        console.log(e.message)
+        res.status(401)
+    }
 })
 
 
