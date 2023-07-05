@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const multer = require('multer')
 const Recipe = require("../../data/recipe")
+const RecipeList = require("../../data/recipeList")
 const {uploadFile, getFile, deleteFile} = require('../s3')
 const fs = require('fs')
 
@@ -10,6 +11,7 @@ router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
         const recipes = await Recipe.find({owner:userId}).exec()
+        const recipeList = await RecipeList.find({owner:userId}).exec()
         for(const recipe in recipes){
             if(recipes[recipe].image.key){
                 const recipeImage = await getFile(recipes[recipe].image.key)
@@ -28,7 +30,7 @@ router.get('/:userId', async (req,res) => {
                 
             // });
             res.set('Content-Type', 'application/json');
-            res.json({recipes});
+            res.json({recipes,recipeList});
             
     } catch (e) {
         console.log(e)
@@ -96,6 +98,24 @@ router.post('/:recipeId/image', uploadImage.single('image'), (req, res) => {
         }
     );
 })
+
+router.post('/:userId/list', async (req,res) => {
+    try {
+        const recipeList = JSON.parse(req.body)
+        const userId = req.params.userId
+
+        const list = new RecipeList({recipes:recipeList, owner:userId})
+
+        let savedList = await list.save() 
+        res.status(201).json({savedList})
+
+    } catch (e) {
+        console.log(e.message)
+        res.status(401)
+    }
+    
+})
+
 
 router.patch('/:recipeId', uploadImage.single('image'), async (req,res) => {
     try {
