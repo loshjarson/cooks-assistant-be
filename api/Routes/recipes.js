@@ -20,15 +20,6 @@ router.get('/:userId', async (req,res) => {
             }
             
         }
-        
-            // .exec((err, recipes) => {
-            //     if (err) {
-            //       console.error('Error retrieving recipes:', err);
-            //       return res.status(500).json({ message: 'Failed to retrieve recipes' });
-            //     }
-          
-                
-            // });
             res.set('Content-Type', 'application/json');
             res.json({recipes,recipeList});
             
@@ -85,13 +76,6 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
             savedRecipe = {...savedRecipe, image:recipeImage}
         }
 
-        
-
-        // if (err) {
-        //     console.error('Error saving recipe:', err);
-        //     return res.status(500).json({ message: 'Failed to save recipe' });
-        // }
-    
         res.json({ recipe: savedRecipe });
 
     } catch (e) {
