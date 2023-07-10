@@ -20,21 +20,35 @@ router.get('/:userId', async (req,res) => {
             }
             
         }
-        
-            // .exec((err, recipes) => {
-            //     if (err) {
-            //       console.error('Error retrieving recipes:', err);
-            //       return res.status(500).json({ message: 'Failed to retrieve recipes' });
-            //     }
-          
-                
-            // });
             res.set('Content-Type', 'application/json');
             res.json({recipes,recipeList});
             
     } catch (e) {
         console.log(e)
         res.status(500)
+    }
+})
+
+router.post('/delete', async (req,res) => {
+    try {
+        const {recipeId} = req.body
+        console.log(recipeId)
+        const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
+        console.log(recipe)
+        if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
+            const recipeImage = await deleteFile(recipe.image.key)
+            if(typeof recipeImage !== 'string'){
+                res.status(400).json({message:"error while deleting image"})
+            }
+        }
+        if(recipe != null){
+            res.status(201).json({message:"Recipe deleted",recipe})
+        } else {
+            res.status(400).json({message:"No matching recipe found"})
+        }     
+    } catch (e) {  
+        console.log(e.message)
+        res.status(401)
     }
 })
 
@@ -62,13 +76,6 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
             savedRecipe = {...savedRecipe, image:recipeImage}
         }
 
-        
-
-        // if (err) {
-        //     console.error('Error saving recipe:', err);
-        //     return res.status(500).json({ message: 'Failed to save recipe' });
-        // }
-    
         res.json({ recipe: savedRecipe });
 
     } catch (e) {
@@ -130,24 +137,6 @@ router.patch('/:recipeId', uploadImage.single('image'), async (req,res) => {
         res.status(401)
     }
     
-})
-
-router.delete('/:recipeId', async (req,res) => {
-    try {
-        const recipeId = req.params.recipeId
-        const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
-        if(recipe.image.key){
-            const recipeImage = await deleteFile(recipes[recipe].image.key)
-        }
-        if(recipe != null){
-            res.status(201).json({message:"Recipe deleted"})
-        } else {
-            res.status(400).json({message:"No matching recipe found"})
-        }     
-    } catch (e) {
-        console.log(e.message)
-        res.status(401)
-    }
 })
 
 
