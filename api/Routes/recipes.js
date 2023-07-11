@@ -11,7 +11,7 @@ router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
         const recipes = await Recipe.find({owner:userId}).exec()
-        const recipeList = await RecipeList.find({owner:userId}).exec()
+        const recipeLists = await RecipeList.find({owner:userId}).exec()
         for(const recipe in recipes){
             if(recipes[recipe].image.key){
                 const recipeImage = await getFile(recipes[recipe].image.key)
@@ -21,7 +21,7 @@ router.get('/:userId', async (req,res) => {
             
         }
             res.set('Content-Type', 'application/json');
-            res.json({recipes,recipeList});
+            res.json({recipes,recipeLists});
             
     } catch (e) {
         console.log(e)
