@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { RolesAnywhere } = require('aws-sdk')
 const RecipeList = require('../../data/recipeList')
 
 router.get('/:userId', async (req,res) => {
@@ -24,6 +25,16 @@ router.post('/update', async (req, res) => {
         } else {
             res.status(500).json({message:"Not Authorized"})
         }
+    } catch (e) {
+        console.log(e)
+        res.status(500)
+    }
+})
+
+router.post('/', async (req,res) => {
+    try {
+        const recipeList = await RecipeList.create({...req.body, owner:req.user.subject});
+        res.status(201).json({recipeList})
     } catch (e) {
         console.log(e)
         res.status(500)
