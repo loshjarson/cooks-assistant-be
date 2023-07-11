@@ -13,3 +13,19 @@ router.get('/:userId', async (req,res) => {
         res.status(500)
     }
 })
+
+router.post('/update', async (req, res) => {
+    try {
+        const {user,body} = req
+        const recipeList = await RecipeList.findById(body._id).exec()
+        if(user.subject === recipeList.owner){
+            const updatedList = await RecipeList.findByIdAndUpdate(body._id,body).exec()
+            res.status(201).json({updatedList})
+        } else {
+            res.status(500).json({message:"Not Authorized"})
+        }
+    } catch (e) {
+        console.log(e)
+        res.status(500)
+    }
+})
