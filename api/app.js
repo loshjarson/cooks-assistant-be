@@ -43,9 +43,11 @@ const usersRouter = require('./Routes/users')
 const recipesRouter = require('./Routes/recipes')
 const authRouter = require('./Routes/auth')
 const devRouter = require('./Routes/dev-recipes')
+const listsRouter = require('./Routes/recipe-lists')
 
 app.use('/auth', authRouter)
 app.use('/users', restricted ,usersRouter)
+app.use('/lists', restricted ,listsRouter)
 
 {process.env.ENVIRONMENT === "dev" ? app.use('/recipes', restricted ,devRouter) : app.use('/recipes', restricted ,recipesRouter)}
 
