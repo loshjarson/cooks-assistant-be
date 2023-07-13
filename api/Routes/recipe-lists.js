@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const { RolesAnywhere } = require('aws-sdk')
 const RecipeList = require('../../data/recipeList')
 
 router.get('/:userId', async (req,res) => {
@@ -33,6 +32,7 @@ router.post('/update', async (req, res) => {
 
 router.post('/', async (req,res) => {
     try {
+        req.body.recipes = JSON.parse(req.body.recipes)
         const recipeList = await RecipeList.create({...req.body, owner:req.user.subject});
         res.status(201).json({recipeList})
     } catch (e) {
@@ -40,3 +40,5 @@ router.post('/', async (req,res) => {
         res.status(500)
     }
 })
+
+module.exports = router
