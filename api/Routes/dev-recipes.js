@@ -38,7 +38,7 @@ router.delete('/:id', async (req,res) => {
         if(recipe != null){
             res.status(201).json({message:"Recipe deleted",recipe})
         } else {
-            res.status(400).json({message:"No matching recipe found"})
+            res.status(204).json({message:"No matching recipe found"})
         }     
     } catch (e) {  
         console.log(e.message)
@@ -121,24 +121,6 @@ router.post('/:recipeId/image', uploadImage.single('image'), (req, res) => {
     );
 })
 
-router.post('/:userId/list', async (req,res) => {
-    try {
-        const recipeList = JSON.parse(req.body)
-        const userId = req.params.userId
-
-        const list = new RecipeList({recipes:recipeList, owner:userId})
-
-        let savedList = await list.save() 
-        res.status(201).json({savedList})
-        
-    } catch (e) {
-        console.log(e.message)
-        res.status(401)
-    }
-    
-
-
-})
 
 router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
     try {
