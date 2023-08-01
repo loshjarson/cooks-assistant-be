@@ -23,9 +23,9 @@ const deleteFile = (filePath) => {
 
 }
 
-router.post('/delete', async (req,res) => {
+router.delete('/:id', async (req,res) => {
     try {
-        const {recipeId} = req.body
+        const {recipeId} = req.params.id
         console.log(recipeId)
         const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
         console.log(recipe)
@@ -59,7 +59,7 @@ router.get('/:userId', async (req,res) => {
             }
         }
             res.set('Content-Type', 'application/json');
-            res.json({recipes, recipeList});
+            res.status(200).json({recipes, recipeList});
             
     } catch (e) {
         console.log(e)
@@ -91,11 +91,11 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
             savedRecipe = {...savedRecipe, image:recipeImage}
         }
     
-        res.json({ recipe: savedRecipe });
+        res.status(201).json({ recipe: savedRecipe });
 
     } catch (e) {
         console.log(e.message)
-        res.status(401)
+        res.status(204)
     }
 })
 
@@ -140,7 +140,7 @@ router.post('/:userId/list', async (req,res) => {
 
 })
 
-router.patch('/:recipeId', uploadImage.single('image'), async (req,res) => {
+router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
     try {
         const update = req.body;
         if(req.file){
