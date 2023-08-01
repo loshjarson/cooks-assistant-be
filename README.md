@@ -187,7 +187,7 @@ Headers: {
 ### Get Recipe Request
 
 ```js
-GET /recipes/{{id}}
+GET /recipes/{{userId}}
 ```
 
 ### Get Recipe Response
@@ -195,6 +195,7 @@ GET /recipes/{{id}}
 ```js
 200 Ok
 ```
+
 
 ```json
 {
@@ -255,11 +256,67 @@ GET /recipes/{{id}}
 ### Update Recipe Request
 
 ```js
-PUT /recipes/{{id}}
+PUT /recipes/{{userId}}
 ```
 
 ```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+    "Content-Type":"multipart/form-data",
+}
+```
 
+```json
+{
+    "name": "Reuben Sandwich",
+    "description": "A delicious sandwich to bring to the beach",
+    "ingredients": [
+        {
+            "name": "slices of rye",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "Thousand Island dressing",
+            "unit":"cup",
+            "amount":.5  
+        },
+        {
+            "name": "slices Swiss cheese",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "slices deli sliced corned beef",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "sauerkraut, drained",
+            "unit":"cup",
+            "amount":1  
+        },
+        {
+            "name": "butter, softened",
+            "unit":"tablespoons",
+            "amount":2  
+        }
+    ],
+    "instructions": {
+        "1":"Preheat a large griddle or skillet over medium heat.",
+        "2":"Spread one side of bread slices evenly with Thousand Island dressing. On four bread slices, layer one slice Swiss cheese, 2 slices corned beef, 1/4 cup sauerkraut, and a second slice of Swiss cheese. Top with remaining bread slices, dressing-side down. Butter the top of each sandwich.",
+        "3":"Place sandwiches, butter-side down on the preheated griddle; butter the top of each sandwich with remaining butter. Grill until both sides are golden brown, about 5 minutes per side. Serve hot.",
+    },
+    "prepTime": 10,
+    "cookTime": 10,
+    "totalTime": 20,
+    "servings": 4,
+    "owner": "00000-000-00000-000000",
+    "tags": ["savory","lunch","sandwich"],
+    "image": ArrayBuffer() {},
+    "createdAt": "2023-08-08T08:00:00",
+    "updatedAt": "2023-08-08T08:00:00"
+}
 ```
 
 ### Update Recipe Response
@@ -273,10 +330,60 @@ or
 ```js
 201 Created
 ```
-
-```yml
-Location: {{host}}/recipes/{{id}}
+```json
+{
+    "_id": "000-0000-0000-00000",
+    "name": "Reuben Sandwich",
+    "description": "A delicious sandwich to bring to the beach",
+    "ingredients": [
+        {
+            "name": "slices of rye",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "Thousand Island dressing",
+            "unit":"cup",
+            "amount":.5  
+        },
+        {
+            "name": "slices Swiss cheese",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "slices deli sliced corned beef",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "sauerkraut, drained",
+            "unit":"cup",
+            "amount":1  
+        },
+        {
+            "name": "butter, softened",
+            "unit":"tablespoons",
+            "amount":2  
+        }
+    ],
+    "instructions": {
+        "1":"Preheat a large griddle or skillet over medium heat.",
+        "2":"Spread one side of bread slices evenly with Thousand Island dressing. On four bread slices, layer one slice Swiss cheese, 2 slices corned beef, 1/4 cup sauerkraut, and a second slice of Swiss cheese. Top with remaining bread slices, dressing-side down. Butter the top of each sandwich.",
+        "3":"Place sandwiches, butter-side down on the preheated griddle; butter the top of each sandwich with remaining butter. Grill until both sides are golden brown, about 5 minutes per side. Serve hot.",
+    },
+    "prepTime": 10,
+    "cookTime": 10,
+    "totalTime": 20,
+    "servings": 4,
+    "owner": "00000xx000xx00000xx000000",
+    "tags": ["savory","lunch","sandwich"],
+    "image": ArrayBuffer() {},
+    "createdAt": "2023-08-08T08:00:00",
+    "updatedAt": "2023-08-08T08:00:00"
+}
 ```
+
 
 ## Delete Recipe
 
@@ -285,6 +392,14 @@ Location: {{host}}/recipes/{{id}}
 ```js
 DELETE /recipes/{{id}}
 ```
+
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
+```
+
+
 
 ### Delete Recipe Response
 
