@@ -4,7 +4,7 @@
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Overview](#overview)
 - [API Definition](#api-definition)
-  - [Create Recipe](#create-recipe)
+  - [Create Grocery](#create-recipe)
     - [Create Recipe Request](#create-recipe-request)
     - [Create Recipe Response](#create-recipe-response)
   - [Get Recipe](#get-recipe)
@@ -28,18 +28,12 @@
   - [Delete Recipe List](#delete-recipe-list)
     - [Delete Recipe List Request](#delete-recipe-list-request)
     - [Delete Recipe List Response](#delete-recipe-list-response)
-  - [Create Grocery List](#create-grocery-list)
-    - [Create Grocery List Request](#create-grocery-list-request)
-    - [Create Grocery List Response](#create-grocery-list-response)
   - [Get Grocery List](#get-grocery-list)
     - [Get Grocery List Request](#get-grocery-list-request)
     - [Get Grocery List Response](#get-grocery-list-response)
   - [Update Grocery List](#update-grocery-list)
     - [Update Grocery List Request](#update-grocery-list-request)
     - [Update Grocery List Response](#update-grocery-list-response)
-  - [Delete Grocery List](#delete-grocery-list)
-    - [Delete Grocery List Request](#delete-grocery-list-request)
-    - [Delete Grocery List Response](#delete-grocery-list-response)
 
 
 ---
@@ -188,6 +182,12 @@ Headers: {
 
 ```js
 GET /recipes/{{userId}}
+```
+
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
 ```
 
 ### Get Recipe Response
@@ -426,11 +426,9 @@ Headers: {
 
 ```json
 {
-    [{
-        "name": "SuperBowl",
-        "recipes": ["000-0000-0000-00000","111-1111-1111-11111","222-2222-2222-22222"],
-        "owner": "00000-000-00000-000000",
-    }]
+    "name": "SuperBowl",
+    "recipes": ["000-0000-0000-00000","111-1111-1111-11111","222-2222-2222-22222"],
+    "owner": "00000-000-00000-000000",
 }
 ```
 
@@ -458,6 +456,11 @@ Headers: {
 
 ```js
 GET /recipelists/{{userId}}
+```
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
 ```
 
 ### Get Recipe List Response
@@ -549,4 +552,165 @@ or
 
 ```js
 201 Deleted
+```
+
+## Get Grocery List
+
+### Get Grocery List Request
+
+```js
+GET /grocerylists
+```
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
+```
+
+### Get Grocery List Response
+
+```js
+200 Ok
+```
+
+```json
+{
+    "_id":"00000-000-00000-000000",
+    "ingredients": [
+        {
+            "name": "slices of rye",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "Thousand Island dressing",
+            "unit":"cup",
+            "amount":.5  
+        },
+        {
+            "name": "slices Swiss cheese",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "slices deli sliced corned beef",
+            "unit":"N/A",
+            "amount":8  
+        },
+        {
+            "name": "sauerkraut, drained",
+            "unit":"cup",
+            "amount":1  
+        },
+        {
+            "name": "butter, softened",
+            "unit":"tablespoons",
+            "amount":2  
+        }
+    ],
+    "owner": "00000-000-00000-000000",
+}
+```
+
+## Update Grocery List
+
+### Update Grocery List Request
+
+```js
+PUT /grocerylists
+```
+
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
+```
+
+```json
+{
+    "ingredients": [
+        {
+            "name": "slices of rye",
+            "unit":"N/A",
+            "amount":16  
+        },
+        {
+            "name": "Thousand Island dressing",
+            "unit":"cup",
+            "amount":1  
+        },
+        {
+            "name": "slices Swiss cheese",
+            "unit":"N/A",
+            "amount":16 
+        },
+        {
+            "name": "slices deli sliced corned beef",
+            "unit":"N/A",
+            "amount":16  
+        },
+        {
+            "name": "sauerkraut, drained",
+            "unit":"cup",
+            "amount":5  
+        },
+        {
+            "name": "butter, softened",
+            "unit":"tablespoons",
+            "amount":4  
+        }
+    ],
+    "owner": "00000-000-00000-000000",
+}
+```
+
+### Update Grocery List Response
+
+```js
+204 No Content
+```
+
+or
+
+```js
+201 Updated
+```
+
+```json
+{
+    "_id":"00000-000-00000-000000",
+    "ingredients": [
+        {
+            "name": "slices of rye",
+            "unit":"N/A",
+            "amount":16  
+        },
+        {
+            "name": "Thousand Island dressing",
+            "unit":"cup",
+            "amount":1  
+        },
+        {
+            "name": "slices Swiss cheese",
+            "unit":"N/A",
+            "amount":16 
+        },
+        {
+            "name": "slices deli sliced corned beef",
+            "unit":"N/A",
+            "amount":16  
+        },
+        {
+            "name": "sauerkraut, drained",
+            "unit":"cup",
+            "amount":5  
+        },
+        {
+            "name": "butter, softened",
+            "unit":"tablespoons",
+            "amount":4  
+        }
+    ],
+    "owner": "00000-000-00000-000000",
+}
 ```
