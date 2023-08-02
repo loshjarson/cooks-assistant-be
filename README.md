@@ -115,7 +115,7 @@ Headers: {
     "cookTime": 10,
     "totalTime": 20,
     "servings": 4,
-    "owner": "00000xx000xx00000xx000000",
+    "owner": "00000-000-00000-000000",
     "tags": ["savory","lunch","sandwich"],
     "image": File { uid: "rc-upload-1690220469210-3", name: "reuben-sandwich.jpeg", lastModified: 1690220594312, webkitRelativePath: "", size: 143584, type: "image/jpeg" },
     "createdAt": "2023-08-08T08:00:00",
@@ -256,7 +256,7 @@ GET /recipes/{{userId}}
 ### Update Recipe Request
 
 ```js
-PUT /recipes/{{userId}}
+PUT /recipes/{{recipeId}}
 ```
 
 ```json
@@ -399,10 +399,154 @@ Headers: {
 }
 ```
 
-
-
 ### Delete Recipe Response
 
 ```js
 204 No Content
+```
+
+or
+
+```js
+201 Deleted
+```
+
+## Create Recipe List 
+
+### Create Recipe List Request
+
+```js
+POST /recipes
+```
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
+```
+
+```json
+{
+    [{
+        "name": "SuperBowl",
+        "recipes": ["000-0000-0000-00000","111-1111-1111-11111","222-2222-2222-22222"],
+        "owner": "00000-000-00000-000000",
+    }]
+}
+```
+
+### Create Recipe List Response
+
+```js
+201 Created
+```
+
+
+```json
+{
+    [{
+        "_id":"00000-000-00000-000000",
+        "name": "SuperBowl",
+        "recipes": ["000-0000-0000-00000","111-1111-1111-11111","222-2222-2222-22222"],
+        "owner": "00000-000-00000-000000",
+    }]
+}
+```
+
+## Get Recipe List
+
+### Get Recipe List Request
+
+```js
+GET /recipelists/{{userId}}
+```
+
+### Get Recipe List Response
+
+```js
+200 Ok
+```
+
+```json
+{
+    [{
+        "_id":"00000-000-00000-000000",
+        "name": "SuperBowl",
+        "recipes": ["000-0000-0000-00000","111-1111-1111-11111","222-2222-2222-22222"],
+        "owner": "00000-000-00000-000000",
+    }]
+}
+```
+
+## Update Recipe List
+
+### Update Recipe List Request
+
+```js
+PUT /recipeslists/{{recipeListId}}
+```
+
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
+```
+
+```json
+{
+    {
+        "name": "SuperBowl",
+        "recipes": ["000-0000-0000-00000","111-1111-1111-11111"],
+        "owner": "00000-000-00000-000000",
+    }
+}
+```
+
+### Update Recipe List Response
+
+```js
+204 No Content
+```
+
+or
+
+```js
+201 Updated
+```
+
+```json
+{
+    {
+        "_id":"00000-000-00000-000000",
+        "name": "SuperBowl",
+        "recipes": ["000-0000-0000-00000","111-1111-1111-11111"],
+        "owner": "00000-000-00000-000000",
+    }
+}
+```
+
+
+## Delete Recipe List
+
+### Delete Recipe List Request
+
+```js
+DELETE /recipelists/{{recipeListId}}
+```
+
+```json
+Headers: {
+    "authorization":"bearer 0000000-0000000-0000000",
+}
+```
+
+### Delete Recipe List Response
+
+```js
+204 No Content
+```
+
+or 
+
+```js
+201 Deleted
 ```
