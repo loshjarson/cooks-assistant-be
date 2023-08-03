@@ -57,14 +57,14 @@ REST API for Cooks Assistant
 ```js
 POST /recipes
 ```
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
     "Content-Type":"multipart/form-data",
 }
 ```
 
-```json
+```js
 {
     "name": "Reuben Sandwich",
     "description": "A delicious sandwich to bring to the beach",
@@ -123,7 +123,7 @@ Headers: {
 201 Created
 ```
 
-```json
+```js
 {
     "name": "Reuben Sandwich",
     "description": "A delicious sandwich to bring to the beach",
@@ -184,7 +184,7 @@ Headers: {
 GET /recipes/{{userId}}
 ```
 
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
@@ -197,7 +197,7 @@ Headers: {
 ```
 
 
-```json
+```js
 {
     "_id": "000-0000-0000-00000",
     "name": "Reuben Sandwich",
@@ -259,14 +259,14 @@ Headers: {
 PUT /recipes/{{recipeId}}
 ```
 
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
     "Content-Type":"multipart/form-data",
 }
 ```
 
-```json
+```js
 {
     "name": "Reuben Sandwich",
     "description": "A delicious sandwich to bring to the beach",
@@ -330,7 +330,7 @@ or
 ```js
 201 Created
 ```
-```json
+```js
 {
     "_id": "000-0000-0000-00000",
     "name": "Reuben Sandwich",
@@ -393,7 +393,7 @@ or
 DELETE /recipes/{{id}}
 ```
 
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
@@ -418,7 +418,7 @@ or
 ```js
 POST /recipes
 ```
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
@@ -439,7 +439,7 @@ Headers: {
 ```
 
 
-```json
+```js
 {
     [{
         "_id":"00000-000-00000-000000",
@@ -457,7 +457,7 @@ Headers: {
 ```js
 GET /recipelists/{{userId}}
 ```
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
@@ -469,7 +469,7 @@ Headers: {
 200 Ok
 ```
 
-```json
+```js
 {
     [{
         "_id":"00000-000-00000-000000",
@@ -488,13 +488,13 @@ Headers: {
 PUT /recipeslists/{{recipeListId}}
 ```
 
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
 ```
 
-```json
+```js
 {
     {
         "name": "SuperBowl",
@@ -516,7 +516,7 @@ or
 201 Updated
 ```
 
-```json
+```js
 {
     {
         "_id":"00000-000-00000-000000",
@@ -536,7 +536,7 @@ or
 DELETE /recipelists/{{recipeListId}}
 ```
 
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
@@ -561,7 +561,7 @@ or
 ```js
 GET /grocerylists
 ```
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
@@ -573,7 +573,7 @@ Headers: {
 200 Ok
 ```
 
-```json
+```js
 {
     "_id":"00000-000-00000-000000",
     "ingredients": [
@@ -620,13 +620,13 @@ Headers: {
 PUT /grocerylists
 ```
 
-```json
+```js
 Headers: {
     "authorization":"bearer 0000000-0000000-0000000",
 }
 ```
 
-```json
+```js
 {
     "ingredients": [
         {
@@ -676,7 +676,7 @@ or
 201 Updated
 ```
 
-```json
+```js
 {
     "_id":"00000-000-00000-000000",
     "ingredients": [
