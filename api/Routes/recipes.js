@@ -27,12 +27,12 @@ router.get('/:userId', async (req,res) => {
     }
 })
 
-router.post('/delete', async (req,res) => {
+router.delete('/:recipeId', async (req,res) => {
     try {
-        const {recipeId} = req.body
-        console.log(recipeId)
+        const {recipeId} = req.params
+
         const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
-        console.log(recipe)
+
         if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
             const recipeImage = await deleteFile(recipe.image.key)
             if(typeof recipeImage !== 'string'){
