@@ -107,8 +107,11 @@ router.post('/:recipeId/image', uploadImage.single('image'), (req, res) => {
 
 
 
-router.patch('/:recipeId', uploadImage.single('image'), async (req,res) => {
+router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
     try {
+        req.body.ingredients = JSON.parse(req.body.ingredients)
+        req.body.instructions = JSON.parse(req.body.instructions)
+        req.body.tags = JSON.parse(req.body.tags)
         const update = req.body;
         if(req.file){
             update.image = req.file.id
