@@ -4,7 +4,7 @@
 - [Give it a star ⭐!](#give-it-a-star-)
 - [Overview](#overview)
 - [API Definition](#api-definition)
-  - [Create Grocery](#create-recipe)
+  - [Create Recipe](#create-recipe)
     - [Create Recipe Request](#create-recipe-request)
     - [Create Recipe Response](#create-recipe-response)
   - [Get Recipe](#get-recipe)
