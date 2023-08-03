@@ -410,7 +410,7 @@ or
 ```js
 201 Deleted
 ```
-
+---
 ## Create Recipe List 
 
 ### Create Recipe List Request
@@ -553,7 +553,7 @@ or
 ```js
 201 Deleted
 ```
-
+---
 ## Get Grocery List
 
 ### Get Grocery List Request
