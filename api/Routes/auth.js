@@ -2,7 +2,8 @@ const router = require("express").Router()
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 
-const User = require("../../data/user")
+const User = require("../../data/user");
+const GroceryList = require("../../data/groceryList");
 
 const makeToken = (user) => {
     const payload = {
@@ -25,6 +26,10 @@ router.post("/register", async (req,res) => {
         const user = await User.create({username:username,password:hash})
         
         const token = makeToken(user);
+
+        const groceryList = await GroceryList.create({groceries:[],owner:user._id})
+        
+
         res.status(201).json({
             message: `Welcome, ${user.username}`,
             token,
