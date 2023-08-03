@@ -44,7 +44,7 @@ const recipesRouter = require('./Routes/recipes')
 const authRouter = require('./Routes/auth')
 const devRouter = require('./Routes/dev-recipes')
 const recipeListsRouter = require('./Routes/recipe-lists');
-const groceryListRouter = require('../Routes/grocery-lists');
+const groceryListRouter = require('./Routes/grocery-list');
 
 app.use('/auth', authRouter)
 app.use('/users', restricted, usersRouter)
