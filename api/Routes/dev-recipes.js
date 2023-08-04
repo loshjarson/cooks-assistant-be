@@ -124,11 +124,20 @@ router.post('/:recipeId/image', uploadImage.single('image'), (req, res) => {
 
 router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
     try {
+        req.body.ingredients = JSON.parse(req.body.ingredients)
+        req.body.instructions = JSON.parse(req.body.instructions)
+        req.body.tags = JSON.parse(req.body.tags)
         const update = req.body;
         if(req.file){
-            update.image = req.file.id
+            update.image = {url:req.file.path,key:req.file.filename}
+            console.log(update.image)
         }
-        const recipe = await Recipe.findByIdAndUpdate(req.params.recipeId,update,{new:true})
+        let recipe = await Recipe.findByIdAndUpdate(req.params.recipeId,update,{new:true})
+
+        if(recipe.image && recipe.image.key){
+            const recipeImage = await getFile(recipe.image.url)
+            recipe = {...recipe, image:recipeImage}
+        }
         res.status(201).json({message:"Recipe updated successfully ", recipe})
     } catch (e) {
         console.log(e.message)
