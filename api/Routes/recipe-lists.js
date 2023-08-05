@@ -35,7 +35,7 @@ router.put('/:recipeListId', async (req, res)=> {
         const listId = req.params.recipeListId
         req.body.recipes = JSON.parse(req.body.recipes)
 
-        const updatedList = await RecipeList.findByIdAndUpdate(listId, req.body)
+        const updatedList = await RecipeList.findByIdAndUpdate(listId, req.body,{new:true})
 
         if(updatedList !== null){
             res.status(201).json({updatedList})
