@@ -1,4 +1,4 @@
-# cooks-assistant-be
+# Cook's Assistant API
 
 
 - [Give it a star ⭐!](#give-it-a-star-)
