@@ -25,10 +25,10 @@ const deleteFile = (filePath) => {
 
 router.delete('/:id', async (req,res) => {
     try {
-        const {recipeId} = req.params.id
-        console.log(recipeId)
+        const recipeId = req.params.id
+
         const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
-        console.log(recipe)
+
         if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
             const recipeImage = await deleteFile(recipe.image.url)
             if(typeof recipeImage !== 'string'){
@@ -124,6 +124,9 @@ router.post('/:recipeId/image', uploadImage.single('image'), (req, res) => {
 
 router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
     try {
+        req.body.ingredients = JSON.parse(req.body.ingredients)
+        req.body.instructions = JSON.parse(req.body.instructions)
+        req.body.tags = JSON.parse(req.body.tags)
         const update = req.body;
         if(req.file){
             update.image = req.file.id

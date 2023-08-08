@@ -29,7 +29,7 @@ router.get('/:userId', async (req,res) => {
 
 router.delete('/:recipeId', async (req,res) => {
     try {
-        const {recipeId} = req.params
+        const recipeId = req.params
 
         const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
 
