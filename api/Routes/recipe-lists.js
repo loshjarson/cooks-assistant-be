@@ -1,12 +1,15 @@
 const router = require('express').Router()
 const RecipeList = require("../../data/recipeList")
 
-router.post('/:userId', async (req,res) => {
+router.post('/', async (req,res) => {
     try {
-        const recipeList = JSON.parse(req.body)
-        const userId = req.params.userId
-
-        const list = new RecipeList({recipes:recipeList, owner:userId})
+        const userId = req.user
+        if (Object.keys(req.body).length !== 0){
+            const recipeList = JSON.parse(req.body)
+            const list = new RecipeList({recipes:recipeList, owner:userId})
+        } else {
+            const list = new RecipeList({recipes:[], owner:userId})
+        }
 
         let savedList = await list.save() 
         res.status(201).json({savedList})

@@ -10,6 +10,7 @@ router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
         const recipes = await Recipe.find({owner:userId}).exec()
+        const recipeList = await RecipeList.find({owner:userId}).exec()
         for(const recipe in recipes){
             if(recipes[recipe].image.key){
                 const recipeImage = await getFile(recipes[recipe].image.key)
@@ -19,7 +20,7 @@ router.get('/:userId', async (req,res) => {
             
         }
             res.set('Content-Type', 'application/json');
-            res.json({recipes});
+            res.json({recipes, recipeList});
             
     } catch (e) {
         console.log(e)
@@ -31,7 +32,7 @@ router.delete('/:recipeId', async (req,res) => {
     try {
         const recipeId = req.params
 
-        const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
+        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:req.user}).exec()
 
         if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
             const recipeImage = await deleteFile(recipe.image.key)
@@ -52,9 +53,9 @@ router.delete('/:recipeId', async (req,res) => {
 
 const uploadImage = multer({dest:"uploads/"})
 
-router.post('/:userId', uploadImage.single("image"), async (req,res) => {
+router.post('/', uploadImage.single("image"), async (req,res) => {
     try {
-        req.body.owner = req.params.userId
+        req.body.owner = req.user
         req.body.ingredients = JSON.parse(req.body.ingredients)
         req.body.instructions = JSON.parse(req.body.instructions)
         req.body.tags = JSON.parse(req.body.tags)
@@ -116,7 +117,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         if(req.file){
             update.image = req.file.id
         }
-        const recipe = await Recipe.findByIdAndUpdate(req.params.recipeId,update,{new:true})
+        const recipe = await Recipe.findOneAndUpdate({_id:req.params.recipeId,owner:req.user},update,{new:true})
         res.status(201).json({message:"Recipe updated successfully ", recipe})
     } catch (e) {
         console.log(e.message)

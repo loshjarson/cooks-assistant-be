@@ -27,7 +27,7 @@ router.delete('/:id', async (req,res) => {
     try {
         const recipeId = req.params.id
 
-        const recipe = await Recipe.findByIdAndDelete(recipeId).exec()
+        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:req.user}).exec()
 
         if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
             const recipeImage = await deleteFile(recipe.image.url)
@@ -49,6 +49,7 @@ router.delete('/:id', async (req,res) => {
 router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
+
         const recipes = await Recipe.find({owner:userId}).exec()
         const recipeList = await RecipeList.find({owner:userId}).exec()
         for(const recipe in recipes){
@@ -71,13 +72,13 @@ const uploadImage = multer({dest:"uploads/"})
 
 router.post('/:userId', uploadImage.single("image"), async (req,res) => {
     try {
-        req.body.owner = req.params.userId
+        req.body.owner = req.user
         req.body.ingredients = JSON.parse(req.body.ingredients)
         req.body.instructions = JSON.parse(req.body.instructions)
         req.body.tags = JSON.parse(req.body.tags)
-        console.log(req.body)
+
         const recipe = new Recipe(req.body)
-        console.log(req.file)
+
         
         if (req.file) {
             recipe.image = {url:req.file.path,key:req.file.filename};
@@ -87,7 +88,7 @@ router.post('/:userId', uploadImage.single("image"), async (req,res) => {
         let savedRecipe = await recipe.save(recipe)
         if(recipe.image && recipe.image.key){
             const recipeImage = await getFile(savedRecipe.image.url)
-            console.log(recipeImage)
+
             savedRecipe = {...savedRecipe, image:recipeImage}
         }
     
@@ -131,7 +132,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         if(req.file){
             update.image = {url:req.file.path,key:req.file.filename};
         }
-        const recipe = await Recipe.findByIdAndUpdate(req.params.recipeId,update,{new:true})
+        const recipe = await Recipe.findOneAndUpdate({_id:req.params.recipeId,owner:req.user},update,{new:true})
         if(recipe.image && recipe.image.key){
             const recipeImage = await getFile(recipe.image.url)
             recipe.image = recipeImage

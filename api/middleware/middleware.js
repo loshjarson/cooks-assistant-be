@@ -13,7 +13,7 @@ const restricted = (req, res, next) => {
         if (err) {
           res.status(403).json("Token is invalid");
         } else {
-          req.user = user;
+          req.user = user.subject;
           next();
         }
       });
