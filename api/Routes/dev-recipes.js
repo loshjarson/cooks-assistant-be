@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const multer = require('multer')
 const Recipe = require("../../data/recipe")
-const RecipeList = require("../../data/recipeList")
 const fs = require('fs')
 
 //transform image into array buffer
@@ -11,7 +10,6 @@ const getFile = (filePath) => {
 }
 
 //remove image from local files
-
 const deleteFile = (filePath) => {
     try{
         fs.unlinkSync(filePath);
@@ -23,20 +21,106 @@ const deleteFile = (filePath) => {
 
 }
 
-router.delete('/:id', async (req,res) => {
-    try {
-        const recipeId = req.params.id
+const uploadImage = multer({dest:"uploads/"})
 
-        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:req.user}).exec()
+router.get('/:userId', async (req,res) => {
+    try {
+        const userId = req.params.userId
+        const recipes = await Recipe.find({owner:userId}).lean()
+        //replace image url and key values in each recipe with input buffer of image
+        recipes.map(async (recipe)=> {
+            if(recipe.image.key){
+                const recipeImage = await getFile(recipes[recipe].image.url)
+                const updatedObj = {...recipe, image:recipeImage}
+                return updatedObj
+            } else return recipe
+        })
+            res.set('Content-Type', 'application/json');
+            res.status(200).json(recipes);
+            
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({message:"Error getting recipes"})
+    }
+})
+
+
+
+router.post('/', uploadImage.single("image"), async (req,res) => {
+    try {
+        const recipe = req.body
+        recipe.owner = req.user
+
+        //parses arrays
+        recipe.ingredients = JSON.parse(req.body.ingredients)
+        recipe.instructions = JSON.parse(req.body.instructions)
+        recipe.tags = JSON.parse(req.body.tags)
+        
+        //set recipe image field to local image props
+        if (req.file) {
+            recipe.image = {url:req.file.path,key:req.file.filename};
+        } else {
+            recipe.image = {url:"uploads\\48fbad0d3d3fcfaab90663eee7f477e2",key:"48fbad0d3d3fcfaab90663eee7f477e2"};
+        }
+
+        const newRecipe = await Recipe.create(recipe)
+
+        //set image field to local file props
+        if(newRecipe.image){
+            const recipeImage = await getFile(newRecipe.image.url)
+            newRecipe.image = recipeImage
+        }
+        res.status(201).json(newRecipe);
+
+    } catch (e) {
+        console.log(e.message)
+        res.status(204).json({message:"Error creating recipe"})
+    }
+})
+
+router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
+    try {
+        const updates = req.body;
+        updates.ingredients = JSON.parse(updates.ingredients)
+        updates.instructions = JSON.parse(updates.instructions)
+        updates.tags = JSON.parse(updates.tags)
+        
+        const oldRecipe = await Recipe.findOne({_id:req.params.recipeId,owner:req.user})
+        const updatedRecipe = await Recipe.findOneAndUpdate({_id:req.params.recipeId,owner:req.user},updates,{new:true})
+        
+        //if update includes a new image then delete the old one
+        if(oldRecipe.image.key !== updatedRecipe.image.key) {
+            await deleteFile(oldRecipe.image.url)
+        }
+
+        //replace image url and key values in each recipe with input buffer of image
+        if(updatedRecipe.image){
+            const recipeImage = await getFile(updatedRecipe.image.url)
+            updatedRecipe.image = recipeImage
+        }
+        res.status(201).json(updatedRecipe)
+
+    } catch (e) {
+        console.log(e.message)
+        res.status(401).json({message:"error while updating recipe"})
+    }
+    
+})
+
+router.delete('/:recipeId', async (req,res) => {
+    try {
+        const recipeId = req.params.recipeId
+
+        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:req.user}).lean()
 
         if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
-            const recipeImage = await deleteFile(recipe.image.url)
+            await deleteFile(recipe.image.url)
             if(typeof recipeImage !== 'string'){
                 res.status(400).json({message:"error while deleting image"})
             }
         }
         if(recipe != null){
-            res.status(201).json({message:"Recipe deleted",recipe})
+            res.status(201).json(recipe)
         } else {
             res.status(204).json({message:"No matching recipe found"})
         }     
@@ -45,108 +129,5 @@ router.delete('/:id', async (req,res) => {
         res.status(401)
     }
 })
-
-router.get('/:userId', async (req,res) => {
-    try {
-        const userId = req.params.userId
-
-        const recipes = await Recipe.find({owner:userId}).exec()
-        const recipeList = await RecipeList.find({owner:userId}).exec()
-        for(const recipe in recipes){
-            if(recipes[recipe].image.key){
-                const recipeImage = await getFile(recipes[recipe].image.url)
-                const updatedObj = {...recipes[recipe], image:recipeImage}
-                recipes[recipe] = updatedObj
-            }
-        }
-            res.set('Content-Type', 'application/json');
-            res.status(200).json({recipes, recipeList});
-            
-    } catch (e) {
-        console.log(e)
-        res.status(500)
-    }
-})
-
-const uploadImage = multer({dest:"uploads/"})
-
-router.post('/:userId', uploadImage.single("image"), async (req,res) => {
-    try {
-        req.body.owner = req.user
-        req.body.ingredients = JSON.parse(req.body.ingredients)
-        req.body.instructions = JSON.parse(req.body.instructions)
-        req.body.tags = JSON.parse(req.body.tags)
-
-        const recipe = new Recipe(req.body)
-
-        
-        if (req.file) {
-            recipe.image = {url:req.file.path,key:req.file.filename};
-        } else {
-            recipe.image = {url:"uploads\\48fbad0d3d3fcfaab90663eee7f477e2",key:"48fbad0d3d3fcfaab90663eee7f477e2"};
-        }
-        let savedRecipe = await recipe.save(recipe)
-        if(recipe.image && recipe.image.key){
-            const recipeImage = await getFile(savedRecipe.image.url)
-
-            savedRecipe = {...savedRecipe, image:recipeImage}
-        }
-    
-        res.status(201).json({ recipe: savedRecipe });
-
-    } catch (e) {
-        console.log(e.message)
-        res.status(204)
-    }
-})
-
-router.post('/:recipeId/image', uploadImage.single('image'), (req, res) => {
-    if (!req.file) {
-        res.status(400).json({ message: 'No file uploaded' });
-        return;
-    }
-    const recipeId = req.params.recipeId;
-    const imageId = req.file.id;
-
-    Recipe.findByIdAndUpdate(
-        recipeId,
-        { image: imageId },
-        { new: true },
-        (err, recipe) => {
-            if (err) {
-                console.error('Error updating recipe:', err);
-                return res.status(500).json({ message: 'Failed to update recipe' });
-            }
-            res.json({ recipe });
-        }
-    );
-})
-
-
-router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
-    try {
-        req.body.ingredients = JSON.parse(req.body.ingredients)
-        req.body.instructions = JSON.parse(req.body.instructions)
-        req.body.tags = JSON.parse(req.body.tags)
-        const update = req.body;
-        if(req.file){
-            update.image = {url:req.file.path,key:req.file.filename};
-        }
-        const recipe = await Recipe.findOneAndUpdate({_id:req.params.recipeId,owner:req.user},update,{new:true})
-        if(recipe.image && recipe.image.key){
-            const recipeImage = await getFile(recipe.image.url)
-            recipe.image = recipeImage
-        }
-        res.status(201).json({message:"Recipe updated successfully ", recipe})
-    } catch (e) {
-        console.log(e.message)
-        res.status(401)
-    }
-    
-})
-
-
-
-
 
 module.exports = router
