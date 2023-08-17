@@ -1,18 +1,12 @@
 const router = require('express').Router()
 const RecipeList = require("../../data/recipeList")
 
-router.post('/', async (req,res) => {
+router.get('/:userId', async (req,res) => {
     try {
-        const userId = req.user
-        if (Object.keys(req.body).length !== 0){
-            const recipeList = JSON.parse(req.body)
-            const list = new RecipeList({recipes:recipeList, owner:userId})
-        } else {
-            const list = new RecipeList({recipes:[], owner:userId})
-        }
+        const userId = req.params.userId
+        const recipeLists = await RecipeList.find({owner:userId}).lean()
 
-        let savedList = await list.save() 
-        res.status(201).json({savedList})
+        res.status(200).json(recipeLists)
 
     } catch (e) {
         console.log(e.message)
@@ -20,12 +14,20 @@ router.post('/', async (req,res) => {
     }
 })
 
-router.get('/:userId', async (req,res) => {
+router.post('/', async (req,res) => {
     try {
-        const userId = req.params.userId
-        const recipeLists = await RecipeList.find({owner:userId}).exec()
+        const userId = req.user
+        let savedList;
+        
+        //check if recipe is included in request before creating list
+        if (Object.keys(req.body).length !== 0){
+            const recipeList = JSON.parse(req.body)
+            savedList = await RecipeList.create({recipes:recipeList, owner:userId})
+        } else {
+            savedList = await RecipeList.create({recipes:[], owner:userId})
+        }
 
-        res.status(200).json({recipeLists})
+        res.status(201).json(savedList)
 
     } catch (e) {
         console.log(e.message)
@@ -36,12 +38,13 @@ router.get('/:userId', async (req,res) => {
 router.put('/:recipeListId', async (req, res)=> {
     try {
         const listId = req.params.recipeListId
-        req.body.recipes = JSON.parse(req.body.recipes)
+        const updates = req.body
+        updates.recipes = JSON.parse(req.body.recipes)
 
-        const updatedList = await RecipeList.findByIdAndUpdate(listId, req.body,{new:true})
+        const updatedList = await RecipeList.findByIdAndUpdate(listId, updates,{new:true})
 
         if(updatedList !== null){
-            res.status(201).json({updatedList})
+            res.status(201).json(updatedList)
         } else {
             res.status(204)
         }
@@ -54,10 +57,10 @@ router.put('/:recipeListId', async (req, res)=> {
 router.delete("/:recipeListId", async (req, res) => {
     try {
         const listId = req.params.recipeListId
-        const deletedList = await RecipeList.findByIdAndDelete(listId).exec()
+        const deletedList = await RecipeList.findByIdAndDelete(listId).lean()
 
         if(deletedList != null){
-            res.status(201).json({message:"Recipe deleted",deletedList})
+            res.status(201).json(deletedList)
         } else {
             res.status(204).json({message:"No matching recipe found"})
         }  
