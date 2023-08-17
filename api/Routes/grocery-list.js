@@ -6,9 +6,9 @@ router.get("/", async (req, res) => {
         const userId = req.user
         const list = await GroceryList.findOne({owner:userId}) 
         if(list !== null){
-            res.status(200).json({list})
+            res.status(200).json(list)
         } else {
-            res.status(204)
+            res.status(204).json({message:"error finding grocery list"})
         }
     } catch (e) {
         console.log(e.message)
@@ -19,13 +19,14 @@ router.get("/", async (req, res) => {
 router.put("/", async (req,res) => {
     try{
         const userId = req.user
-        req.body.groceries = JSON.parse(req.body.groceries)
-        const updatedList = await GroceryList.findOneAndUpdate({owner:userId},req.body)
+        const updates = req.body;
+        updates.groceries = JSON.parse(req.body.groceries)
+        const updatedList = await GroceryList.findOneAndUpdate({owner:userId},updates)
 
         if(updated !== null){
-            res.status(201).json({updatedList})
+            res.status(201).json(updatedList)
         } else {
-            res.status(204)
+            res.status(204).json({message:"error finding grocery list"})
         }
     } catch (e) {
         console.log(e.message)
