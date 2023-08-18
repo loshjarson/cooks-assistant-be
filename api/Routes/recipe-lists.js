@@ -17,14 +17,15 @@ router.get('/:userId', async (req,res) => {
 router.post('/', async (req,res) => {
     try {
         const userId = req.user
+        const newList = req.body
         let savedList;
         
         //check if recipe is included in request before creating list
-        if (Object.keys(req.body).length !== 0){
-            const recipeList = JSON.parse(req.body)
-            savedList = await RecipeList.create({recipes:recipeList, owner:userId})
+        if (newList.recipes){
+            const newList = JSON.parse(req.body)
+            savedList = await RecipeList.create({name: newList.name,recipes:newList.recipes, owner:userId})
         } else {
-            savedList = await RecipeList.create({recipes:[], owner:userId})
+            savedList = await RecipeList.create({name: newList.name,recipes:[], owner:userId})
         }
 
         res.status(201).json(savedList)
