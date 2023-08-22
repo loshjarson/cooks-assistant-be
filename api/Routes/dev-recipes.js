@@ -2,6 +2,7 @@ const router = require('express').Router()
 const multer = require('multer')
 const Recipe = require("../../data/recipe")
 const fs = require('fs')
+const mongoose = require('mongoose')
 
 //transform image into array buffer
 const getFile = (filePath) => {
@@ -13,10 +14,11 @@ const getFile = (filePath) => {
 const deleteFile = (filePath) => {
     try{
         fs.unlinkSync(filePath);
-        return "file deleted successfully"
+        return true
     }
     catch(e){
-        return e
+        console.log(e)
+        return false
     }
 
 }
@@ -28,15 +30,12 @@ router.get('/:userId', async (req,res) => {
         const userId = req.params.userId
         const recipes = await Recipe.find({owner:userId}).lean()
         //replace image url and key values in each recipe with input buffer of image
-        recipes.map(async (recipe)=> {
-            if(recipe.image.key){
-                const recipeImage = await getFile(recipes[recipe].image.url)
-                const updatedObj = {...recipe, image:recipeImage}
-                return updatedObj
-            } else return recipe
+        recipes.forEach((recipe,i)=> {
+                const recipeImage = getFile(recipe.image.url)
+                recipes[i].image = recipeImage
         })
-            res.set('Content-Type', 'application/json');
-            res.status(200).json(recipes);
+        res.set('Content-Type', 'application/json');
+        res.status(200).json([...recipes]);
             
     } catch (e) {
         console.log(e)
@@ -84,18 +83,22 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         updates.ingredients = JSON.parse(updates.ingredients)
         updates.instructions = JSON.parse(updates.instructions)
         updates.tags = JSON.parse(updates.tags)
-        
+
         const oldRecipe = await Recipe.findOne({_id:req.params.recipeId,owner:req.user})
-        const updatedRecipe = await Recipe.findOneAndUpdate({_id:req.params.recipeId,owner:req.user},updates,{new:true})
-        
-        //if update includes a new image then delete the old one
-        if(oldRecipe.image.key !== updatedRecipe.image.key) {
-            await deleteFile(oldRecipe.image.url)
+        if(!req.file){
+            delete updates["image"]
+        } else if(oldRecipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2") {
+            deleteFile(oldRecipe.image.url)
+            updates.image = {url:req.file.path,key:req.file.filename}
+        } else {
+            updates.image = {url:req.file.path,key:req.file.filename}
         }
+        
+        const updatedRecipe = await Recipe.findOneAndUpdate({_id:new mongoose.Types.ObjectId(req.params.recipeId),owner:new mongoose.Types.ObjectId(req.user)},updates,{new:true}).lean()
 
         //replace image url and key values in each recipe with input buffer of image
         if(updatedRecipe.image){
-            const recipeImage = await getFile(updatedRecipe.image.url)
+            const recipeImage = getFile(updatedRecipe.image.url)
             updatedRecipe.image = recipeImage
         }
         res.status(201).json(updatedRecipe)
@@ -109,21 +112,25 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
 
 router.delete('/:recipeId', async (req,res) => {
     try {
-        const recipeId = req.params.recipeId
+        const recipeId = new mongoose.Types.ObjectId(req.params.recipeId)
+        const userId = new mongoose.Types.ObjectId(req.user)
 
-        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:req.user}).lean()
 
-        if(recipe.image.key && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
-            await deleteFile(recipe.image.url)
-            if(typeof recipeImage !== 'string'){
+        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:userId}).lean()
+        console.log(recipe)
+        if(recipe.image && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
+            const recipeImage = await deleteFile(recipe.image.url)
+            if(!recipeImage){
                 res.status(400).json({message:"error while deleting image"})
             }
-        }
-        if(recipe != null){
-            res.status(201).json(recipe)
         } else {
-            res.status(204).json({message:"No matching recipe found"})
-        }     
+            if(recipe != null){
+                res.status(201).json(recipe)
+            } else {
+                res.status(204).json({message:"No matching recipe found"})
+            } 
+        }
+            
     } catch (e) {  
         console.log(e.message)
         res.status(401)
