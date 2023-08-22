@@ -78,12 +78,16 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         updates.tags = JSON.parse(updates.tags)
         
         const oldRecipe = await Recipe.findOne({_id:req.params.recipeId,owner:req.user})
-        const updatedRecipe = await Recipe.findOneAndUpdate({_id:new mongoose.Types.ObjectId(req.params.recipeId),owner:new mongoose.Types.ObjectId(req.user)},updates,{new:true})
-        
-        //if update includes a new image then delete the old one
-        if(oldRecipe.image.key !== updatedRecipe.image.key) {
-            await deleteFile(oldRecipe.image.key)
+        if(!req.file){
+            delete updates["image"]
+        } else if(oldRecipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2") {
+            deleteFile(oldRecipe.image.url)
+            updates.image = {url:req.file.path,key:req.file.filename}
+        } else {
+            updates.image = {url:req.file.path,key:req.file.filename}
         }
+
+        const updatedRecipe = await Recipe.findOneAndUpdate({_id:new mongoose.Types.ObjectId(req.params.recipeId),owner:new mongoose.Types.ObjectId(req.user)},updates,{new:true})
 
         //replace image url and key values in each recipe with input buffer of image
         if(updatedRecipe.image){
