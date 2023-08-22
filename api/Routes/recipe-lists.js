@@ -1,10 +1,11 @@
 const router = require('express').Router()
 const RecipeList = require("../../data/recipeList")
+const mongoose = require('mongoose')
 
 router.get('/:userId', async (req,res) => {
     try {
         const userId = req.params.userId
-        const recipeLists = await RecipeList.find({owner:userId}).lean()
+        const recipeLists = await RecipeList.find({owner:new  mongoose.Types.ObjectId(userId)}).lean()
 
         res.status(200).json(recipeLists)
 
@@ -22,10 +23,10 @@ router.post('/', async (req,res) => {
         
         //check if recipe is included in request before creating list
         if (newList.recipes){
-            const newList = JSON.parse(req.body)
-            savedList = await RecipeList.create({name: newList.name,recipes:newList.recipes, owner:userId})
+            newList.recipes = JSON.parse(newList.recipes)
+            savedList = await RecipeList.create({name: newList.name,recipes:newList.recipes, owner:new  mongoose.Types.ObjectId(userId)})
         } else {
-            savedList = await RecipeList.create({name: newList.name,recipes:[], owner:userId})
+            savedList = await RecipeList.create({name: newList.name,recipes:[], owner:new  mongoose.Types.ObjectId(userId)})
         }
 
         res.status(201).json(savedList)
@@ -40,6 +41,7 @@ router.put('/:recipeListId', async (req, res)=> {
     try {
         const listId = req.params.recipeListId
         const updates = req.body
+        console.log(updates)
         updates.recipes = JSON.parse(req.body.recipes)
 
         const updatedList = await RecipeList.findByIdAndUpdate(listId, updates,{new:true})

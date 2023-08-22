@@ -3,6 +3,7 @@ const multer = require('multer')
 const Recipe = require("../../data/recipe")
 const {uploadFile, getFile, deleteFile} = require('../s3')
 const fs = require('fs')
+const mongoose = require('mongoose')
 
 const uploadImage = multer({dest:"uploads/"})
 
@@ -77,7 +78,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         updates.tags = JSON.parse(updates.tags)
         
         const oldRecipe = await Recipe.findOne({_id:req.params.recipeId,owner:req.user})
-        const updatedRecipe = await Recipe.findOneAndUpdate({_id:req.params.recipeId,owner:req.user},updates,{new:true})
+        const updatedRecipe = await Recipe.findOneAndUpdate({_id:new mongoose.Types.ObjectId(req.params.recipeId),owner:new mongoose.Types.ObjectId(req.user)},updates,{new:true})
         
         //if update includes a new image then delete the old one
         if(oldRecipe.image.key !== updatedRecipe.image.key) {
@@ -104,7 +105,7 @@ router.delete('/:recipeId', async (req,res) => {
         const recipeId = req.params.recipeId
 
         //delete recipe from database
-        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:req.user}).lean()
+        const recipe = await Recipe.findOneAndDelete({_id:new mongoose.Types.ObjectId(recipeId),owner:new mongoose.Types.ObjectId(req.user)}).lean()
         if(recipe === null){
             res.status(204).json({message:"No matching recipe found"})
         } 
