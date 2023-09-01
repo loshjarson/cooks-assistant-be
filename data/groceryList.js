@@ -1,11 +1,7 @@
 const mongoose = require('mongoose')
 
 const groceryListSchema = new mongoose.Schema({
-    groceries: [{
-        name: String,
-        amount: Number,
-        unit: String
-    }],
+    groceries:[{recipe:{type: mongoose.Schema.Types.ObjectId, ref:'recipes'},quantity:{type:Number, default:0}}],
     owner: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
 })
 
