@@ -5,6 +5,8 @@ const {uploadFile, getFile, deleteFile} = require('../s3')
 const fs = require('fs')
 const mongoose = require('mongoose')
 const User = require('../../data/user')
+const GroceryList = require('../../data/groceryList')
+const RecipeList = require('../../data/recipeList')
 
 const uploadImage = multer({dest:"uploads/"})
 
@@ -90,7 +92,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         if(!req.file){
             delete updates["image"]
         } else if(oldRecipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2") {
-            deleteFile(oldRecipe.image.url)
+            deleteFile(oldRecipe.image.key)
             updates.image = {url:req.file.path,key:req.file.filename}
         } else {
             updates.image = {url:req.file.path,key:req.file.filename}
