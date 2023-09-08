@@ -33,6 +33,7 @@ router.get('/:userId', async (req,res) => {
 router.post('/', uploadImage.single("image"), async (req,res) => {
     try {
         const recipe = req.body
+        const user = new mongoose.Types.ObjectId(req.user)
         //pull owner's user id from token
         recipe.owner = req.user
         //parses arrays
@@ -49,12 +50,9 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
                 console.log("succesfully deleted image from local server")
             })
         } 
-        
-        /* Figure out how to set default image using aws file
          else {
              recipe.image = {url:"uploads\\3aa453485ddbbbbb3be4bc83d11ba3cb",key:"3aa453485ddbbbbb3be4bc83d11ba3cb"};
          }
-        */
 
         const newRecipe = await Recipe.create(recipe)
         await User.findByIdAndUpdate(req.user,{$addToSet:{recipes:newRecipe._id}})
