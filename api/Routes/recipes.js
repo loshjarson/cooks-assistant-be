@@ -58,7 +58,7 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
 
         const newRecipe = await Recipe.create(recipe)
         await User.findByIdAndUpdate(req.user,{$addToSet:{recipes:newRecipe._id}})
-        await GroceryList.findOneAndUpdate({owner:req.user}, {$addToSet: {recipe:newRecipe._id}})
+        await GroceryList.findOneAndUpdate({owner:user}, {$addToSet: {groceries:{recipe: newRecipe._id}}})
         
         //sets recipe image field to aws file props
         if(newRecipe.image){

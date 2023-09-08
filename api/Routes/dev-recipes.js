@@ -54,6 +54,7 @@ router.get('/:userId', async (req,res) => {
 router.post('/', uploadImage.single("image"), async (req,res) => {
     try {
         const recipe = req.body
+        const user = new mongoose.Types.ObjectId(req.user)
         recipe.owner = req.user
 
         //parses arrays
@@ -70,8 +71,7 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
 
         const newRecipe = await Recipe.create(recipe)
         await User.findByIdAndUpdate(req.user,{$addToSet:{recipes:newRecipe._id}})
-        await GroceryList.findOneAndUpdate({owner:req.user}, {$addToSet: {recipe:newRecipe._id}})
-
+        await GroceryList.findOneAndUpdate({owner:user}, {$addToSet: {groceries:{recipe: newRecipe._id}}})
         //set image field to local file props
         if(newRecipe.image){
             const recipeImage = await getFile(newRecipe.image.url)
