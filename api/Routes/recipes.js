@@ -35,9 +35,8 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
         const recipe = req.body
         const user = new mongoose.Types.ObjectId(req.user)
         //pull owner's user id from token
-        recipe.owner = req.user
+        recipe.owner = user
         //parses arrays
-        console.log(recipe)
         recipe.ingredients = JSON.parse(req.body.ingredients)
         recipe.instructions = JSON.parse(req.body.instructions)
         recipe.tags = JSON.parse(req.body.tags)
@@ -55,7 +54,7 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
          }
 
         const newRecipe = await Recipe.create(recipe)
-        await User.findByIdAndUpdate(req.user,{$addToSet:{recipes:newRecipe._id}})
+        await User.findByIdAndUpdate(user,{$addToSet:{recipes:newRecipe._id}})
         await GroceryList.findOneAndUpdate({owner:user}, {$addToSet: {groceries:{recipe: newRecipe._id}}})
         
         //sets recipe image field to aws file props
