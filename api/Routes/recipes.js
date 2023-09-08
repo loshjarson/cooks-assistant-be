@@ -52,7 +52,7 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
         
         /* Figure out how to set default image using aws file
          else {
-             recipe.image = {url:"uploads\\48fbad0d3d3fcfaab90663eee7f477e2",key:"48fbad0d3d3fcfaab90663eee7f477e2"};
+             recipe.image = {url:"uploads\\3aa453485ddbbbbb3be4bc83d11ba3cb",key:"3aa453485ddbbbbb3be4bc83d11ba3cb"};
          }
         */
 
@@ -91,7 +91,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         }
         if(!req.file){
             delete updates["image"]
-        } else if(oldRecipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2") {
+        } else if(oldRecipe.image.key !== "3aa453485ddbbbbb3be4bc83d11ba3cb") {
             deleteFile(oldRecipe.image.key)
             updates.image = {url:req.file.path,key:req.file.filename}
         } else {
@@ -117,32 +117,29 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
 
 router.delete('/:recipeId', async (req,res) => {
     try {
-        const updates = req.body;
-        updates.ingredients = JSON.parse(updates.ingredients)
-        updates.instructions = JSON.parse(updates.instructions)
-        updates.tags = JSON.parse(updates.tags)
         const recipeId = new mongoose.Types.ObjectId(req.params.recipeId)
         const userId = new mongoose.Types.ObjectId(req.user)
+        console.log("working")
 
-        const oldRecipe = await Recipe.findOne({_id:recipeId,owner:userId})
-        if(oldRecipe === null){
-            res.status(400).json({message:"Recipe either does not exist or you are not the owner"})
-        } else if(!req.file){
-            delete updates["image"]
-        } else if(oldRecipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2") {
-            deleteFile(oldRecipe.image.url)
-            updates.image = {url:req.file.path,key:req.file.filename}
-        } else {
-            updates.image = {url:req.file.path,key:req.file.filename}
-        }
-        if(oldRecipe !== null) {
-          const updatedRecipe = await Recipe.findOneAndUpdate({_id:recipeId},updates,{new:true}).lean()
-            //replace image url and key values in each recipe with input buffer of image
-            if(updatedRecipe.image){
-                const recipeImage = getFile(updatedRecipe.image.key)
-                updatedRecipe.image = recipeImage
+        await User.findByIdAndUpdate(userId,{$pull: {recipes:recipeId}}).exec()
+        await RecipeList.updateMany({owner:userId,recipes:{$in: recipeId}},{$pull:{recipes:recipeId}})
+        await GroceryList.findOneAndUpdate({owner:userId},{$pull: {recipes:{recipe:recipeId}}})
+
+        const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:userId}).exec()
+
+        if(recipe.image && recipe.image.key !== "3aa453485ddbbbbb3be4bc83d11ba3cb"){
+            const recipeImage = await deleteFile(recipe.image.url)
+            if(!recipeImage){
+                res.status(400).json({message:"error while deleting image"})
+            } else {
+               res.status(201).json({message:"deleted"}) 
             }
-            res.status(201).json(updatedRecipe)  
+        } else {
+            if(recipe != null){
+                res.status(201).json({message:"deleted"})
+            } else {
+                res.status(204).json({message:"No matching recipe found"})
+            }
         }
         
 

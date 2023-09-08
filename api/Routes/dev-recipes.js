@@ -66,7 +66,7 @@ router.post('/', uploadImage.single("image"), async (req,res) => {
         if (req.file) {
             recipe.image = {url:req.file.path,key:req.file.filename};
         } else {
-            recipe.image = {url:"uploads\\48fbad0d3d3fcfaab90663eee7f477e2",key:"48fbad0d3d3fcfaab90663eee7f477e2"};
+            recipe.image = {url:"uploads\\3aa453485ddbbbbb3be4bc83d11ba3cb",key:"3aa453485ddbbbbb3be4bc83d11ba3cb"};
         }
 
         const newRecipe = await Recipe.create(recipe)
@@ -103,7 +103,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
             res.status(400).json({message:"Recipe either does not exist or you are not the owner"})
         } else if(!req.file){
             delete updates["image"]
-        } else if(oldRecipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2") {
+        } else if(oldRecipe.image.key !== "3aa453485ddbbbbb3be4bc83d11ba3cb") {
             deleteFile(oldRecipe.image.url)
             updates.image = {url:req.file.path,key:req.file.filename}
         } else {
@@ -139,7 +139,7 @@ router.delete('/:recipeId', async (req,res) => {
 
         const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:userId}).exec()
 
-        if(recipe.image && recipe.image.key !== "48fbad0d3d3fcfaab90663eee7f477e2"){
+        if(recipe.image && recipe.image.key !== "3aa453485ddbbbbb3be4bc83d11ba3cb"){
             const recipeImage = await deleteFile(recipe.image.url)
             if(!recipeImage){
                 res.status(400).json({message:"error while deleting image"})
