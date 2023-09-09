@@ -24,10 +24,10 @@ router.put("/update", async (req,res) => {
         console.log(updates)
         updates.recipes = JSON.parse(req.body.recipes)
         console.log(updates.recipes)
-        await Promise.all(updates.recipes.forEach(async recipe => {
-            const list = await GroceryList.findOneAndUpdate({owner:userId, "groceries.recipe":recipe.recipe}, {$set: {"groceries.$.quantity":recipe.quantity}}, {new:true})
-            console.log(list)
+        const promises = await Promise.all(updates.recipes.map(async recipe => {
+            return await GroceryList.findOneAndUpdate({owner:userId, "groceries.recipe":recipe.recipe}, {$set: {"groceries.$.quantity":recipe.quantity}}, {new:true})
         }))
+        console.log(promises)
         const updatedList = await GroceryList.findOne({owner:userId}).lean()
         if(updatedList){
             res.status(201).json(updatedList)
