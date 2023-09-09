@@ -96,7 +96,7 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
             updates.image = {url:req.file.path,key:req.file.filename}
         }
 
-        const updatedRecipe = await Recipe.findOneAndUpdate({_id:recipeId,owner:userId},updates,{new:true})
+        const updatedRecipe = await Recipe.findOneAndUpdate({_id:recipeId,owner:userId},updates,{new:true}).lean()
 
         //replace image url and key values in each recipe with input buffer of image
         if(updatedRecipe.image){
