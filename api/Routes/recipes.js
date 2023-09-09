@@ -122,7 +122,6 @@ router.delete('/:recipeId', async (req,res) => {
     try {
         const recipeId = new mongoose.Types.ObjectId(req.params.recipeId)
         const userId = new mongoose.Types.ObjectId(req.user)
-        console.log("working")
 
         await User.findByIdAndUpdate(userId,{$pull: {recipes:recipeId}}).exec()
         await RecipeList.updateMany({owner:userId,recipes:{$in: recipeId}},{$pull:{recipes:recipeId}})

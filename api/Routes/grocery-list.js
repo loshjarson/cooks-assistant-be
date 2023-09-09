@@ -6,9 +6,7 @@ router.get("/", async (req, res) => {
     try{
         const userId = new mongoose.Types.ObjectId(req.user)
         const list = await GroceryList.findOne({owner:userId}).lean() 
-        console.log(list.groceries)
         if(list){
-            console.log("sending")
             res.status(200).json(list)
         } else {
             res.status(204).json({message:"error finding grocery list"})
@@ -29,7 +27,6 @@ router.put("/update", async (req,res) => {
             await GroceryList.findOneAndUpdate({owner:userId, "groceries.recipe":recipe.recipe}, {$set: {"groceries.$.quantity":recipe.quantity}}, {new:true})
         }))
         const updatedList = await GroceryList.findOne({owner:userId}).lean()
-        console.log(updatedList)
         if(updatedList){
             res.status(201).json(updatedList)
         } else {

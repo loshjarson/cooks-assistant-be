@@ -44,7 +44,6 @@ router.put('/:recipeListId', async (req, res)=> {
         const listId = req.params.recipeListId
         const updates = req.body
         let updatedList;
-        console.log(updates)
         if(updates.recipeToAdd){
             updatedList = await RecipeList.findByIdAndUpdate(listId, {$addToSet:{recipes:updates.recipeToAdd}},{new:true})
             await User.findByIdAndUpdate(req.user,{$addToSet:{recipes:updates.recipeToAdd}})

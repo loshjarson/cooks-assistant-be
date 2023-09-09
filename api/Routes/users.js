@@ -13,16 +13,7 @@ const getFile = (filePath) => {
 
 router.get('/', async (req,res) => {
     const users = await User.find({}).select({username:1}).lean();
-    console.log(users)
     res.status(200).json(users)
-})
-
-router.get('/', (req,res) => {
-    
-})
-
-router.get('/:id', (req,res) => {
-
 })
 
 router.put('/remove', async (req,res) => {
@@ -53,10 +44,6 @@ router.put('/add', async (req,res) => {
         res.status(400).json({message:"error while adding recipe"})
     }
     
-})
-
-router.delete('/', (req,res) => {
-
 })
 
 
