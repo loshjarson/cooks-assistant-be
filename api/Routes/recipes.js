@@ -17,6 +17,7 @@ router.get('/:userId', async (req,res) => {
         let response = []
         //replace image url and key values in each recipe with input buffer of image
         await Promise.all(recipeIds.recipes.map(async (recipeId,i)=> {
+                
                 const recipe = await Recipe.findById(recipeId).lean()
                 recipe.image = await getFile(recipe.image.key)
                 response.push(recipe)
@@ -100,6 +101,9 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         //replace image url and key values in each recipe with input buffer of image
         if(updatedRecipe.image){
             const recipeImage = await getFile(updatedRecipe.image.key)
+            updatedRecipe.image = recipeImage
+        } else {
+            const recipeImage = await getFile("3aa453485ddbbbbb3be4bc83d11ba3cb")
             updatedRecipe.image = recipeImage
         }
         res.status(201).json(updatedRecipe)
