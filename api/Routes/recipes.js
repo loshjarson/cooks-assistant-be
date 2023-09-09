@@ -102,10 +102,12 @@ router.put('/:recipeId', uploadImage.single('image'), async (req,res) => {
         if(updatedRecipe.image){
             const recipeImage = await getFile(updatedRecipe.image.key)
             updatedRecipe.image = recipeImage
+            console.log("new",updatedRecipe)
             res.status(201).json(updatedRecipe)
         } else {
             const recipeImage = await getFile("3aa453485ddbbbbb3be4bc83d11ba3cb")
             updatedRecipe.image = recipeImage
+            console.log("def",updatedRecipe)
             res.status(201).json(updatedRecipe)
         }
         
