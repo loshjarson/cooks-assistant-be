@@ -25,9 +25,7 @@ router.put("/update", async (req,res) => {
         updates.recipes = JSON.parse(req.body.recipes)
         console.log(updates.recipes)
         await Promise.all(updates.recipes.forEach(async recipe => {
-            console.log(recipe)
-            const recipeId = new mongoose.Types.ObjectId(recipe.recipe)
-            const list = await GroceryList.findOneAndUpdate({owner:userId, "groceries.recipe":recipeId}, {$set: {"groceries.$.quantity":recipe.quantity}}, {new:true})
+            const list = await GroceryList.findOneAndUpdate({owner:userId, "groceries.recipe":recipe.recipe}, {$set: {"groceries.$.quantity":recipe.quantity}}, {new:true})
             console.log(list)
         }))
         const updatedList = await GroceryList.findOne({owner:userId}).lean()
