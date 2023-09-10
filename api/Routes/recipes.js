@@ -123,7 +123,7 @@ router.delete('/:recipeId', async (req,res) => {
 
         await User.findByIdAndUpdate(userId,{$pull: {recipes:recipeId}}).exec()
         await RecipeList.updateMany({owner:userId,recipes:{$in: recipeId}},{$pull:{recipes:recipeId}})
-        await GroceryList.findOneAndUpdate({owner:userId},{$pull: {recipes:{recipe:recipeId}}})
+        await GroceryList.findOneAndUpdate({owner:userId},{$pull: {recipes:{recipe:recipeId}}},{ safe: true, multi:true })
 
         const recipe = await Recipe.findOneAndDelete({_id:recipeId,owner:userId}).exec()
 
