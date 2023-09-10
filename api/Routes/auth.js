@@ -23,18 +23,26 @@ router.post("/register", async (req,res) => {
         const {username, password} = req.body;
         const hash = bcrypt.hashSync(password)
 
-        const user = await User.create({username:username,password:hash})
-        
-        const token = makeToken(user);
+        const existingUser = await User.findOne({username:username})
 
-        const groceryList = await GroceryList.create({groceries:[],owner:user._id})
+        if(existingUser) {
+            res.status(403).json({message:"Username Taken"})
+        } else {
+           const user = await User.create({username:username,password:hash})
         
+            const token = makeToken(user);
 
-        res.status(201).json({
-            message: `Welcome, ${user.username}`,
-            token,
-            id: user._id
-        })
+            await GroceryList.create({groceries:[],owner:user._id})
+            
+
+            res.status(201).json({
+                message: `Welcome, ${user.username}`,
+                token,
+                id: user._id
+            }) 
+        }
+
+        
     } catch (e) {
         console.log(e.message)
         res.status(401)
